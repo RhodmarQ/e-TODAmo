@@ -1,0 +1,7 @@
+Resolving dependencies...
+Because flutter_application_1 depends on supabase_flutter ^1.14.0 which doesn't match any versions, version solving failed.
+
+
+You can try the following suggestion to make the pubspec resolve:
+* Try upgrading your constraint on supabase_flutter: flutter pub add supabase_flutter:^2.15.0
+Failed to update packages.
