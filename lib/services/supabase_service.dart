@@ -81,9 +81,24 @@ class SupabaseService {
       return _currentUser!;
 
     } on AuthException catch (e) {
-
+      final text = e.toString().toLowerCase().replaceAll('_', ' ');
+      if (text.contains('rate limit') ||
+          text.contains('too many requests') ||
+          text.contains('429') ||
+          text.contains('exceeded')) {
+        throw Exception(
+            'Email rate limit reached. Please wait 5–10 minutes, then try again.');
+      }
       throw Exception('Auth error: ${e.message}');
     } catch (e) {
+      final s = e.toString().toLowerCase().replaceAll('_', ' ');
+      if (s.contains('rate limit') ||
+          s.contains('too many requests') ||
+          s.contains('429') ||
+          s.contains('exceeded')) {
+        throw Exception(
+            'Email rate limit reached. Please wait 5–10 minutes, then try again.');
+      }
       throw Exception('Registration error: $e');
     }
   }

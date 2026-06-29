@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../repositories/auth_repository.dart';
 
 class RegisterFormPage extends StatefulWidget {
   final String userType;
@@ -17,8 +20,11 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
   late TextEditingController _confirmPasswordController;
+
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isLoading = false;
+
   String? _selectedMonth;
   String? _selectedDay;
   String? _selectedYear;
@@ -35,7 +41,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
     'September',
     'October',
     'November',
-    'December'
+    'December',
   ];
 
   @override
@@ -83,7 +89,6 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
             child: Column(
               children: [
-                // App Logo
                 Container(
                   width: 80,
                   height: 80,
@@ -98,7 +103,6 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // App Name
                 RichText(
                   text: const TextSpan(
                     children: [
@@ -122,7 +126,6 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                // Register Title
                 Text(
                   'Register',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -131,7 +134,6 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                       ),
                 ),
                 const SizedBox(height: 30),
-                // Form Card
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -141,7 +143,6 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Username Field
                       const Text(
                         'Username',
                         style: TextStyle(
@@ -153,6 +154,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: _usernameController,
+                        enabled: !_isLoading,
                         decoration: InputDecoration(
                           hintText: 'Input Username',
                           hintStyle: const TextStyle(color: Color(0xFFBDBDBD)),
@@ -169,7 +171,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      // Email Field
+
                       const Text(
                         'Email',
                         style: TextStyle(
@@ -181,6 +183,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: _emailController,
+                        enabled: !_isLoading,
                         decoration: InputDecoration(
                           hintText: 'Input Email',
                           hintStyle: const TextStyle(color: Color(0xFFBDBDBD)),
@@ -197,7 +200,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      // Password Field
+
                       const Text(
                         'Password',
                         style: TextStyle(
@@ -209,6 +212,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: _passwordController,
+                        enabled: !_isLoading,
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
                           hintText: 'Input Password',
@@ -230,16 +234,18 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                                   : Icons.visibility,
                               color: const Color(0xFF757575),
                             ),
-                            onPressed: () {
-                              setState(() {
-                                _obscurePassword = !_obscurePassword;
-                              });
-                            },
+                            onPressed: _isLoading
+                                ? null
+                                : () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
                           ),
                         ),
                       ),
                       const SizedBox(height: 16),
-                      // Confirm Password Field
+
                       const Text(
                         'Confirm Password',
                         style: TextStyle(
@@ -251,6 +257,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: _confirmPasswordController,
+                        enabled: !_isLoading,
                         obscureText: _obscureConfirmPassword,
                         decoration: InputDecoration(
                           hintText: 'Input Password again',
@@ -272,17 +279,19 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                                   : Icons.visibility,
                               color: const Color(0xFF757575),
                             ),
-                            onPressed: () {
-                              setState(() {
-                                _obscureConfirmPassword =
-                                    !_obscureConfirmPassword;
-                              });
-                            },
+                            onPressed: _isLoading
+                                ? null
+                                : () {
+                                    setState(() {
+                                      _obscureConfirmPassword =
+                                          !_obscureConfirmPassword;
+                                    });
+                                  },
                           ),
                         ),
                       ),
                       const SizedBox(height: 16),
-                      // Birthdate Field
+
                       const Text(
                         'Birthdate',
                         style: TextStyle(
@@ -294,23 +303,24 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          // Month Dropdown
                           Expanded(
                             child: DropdownButton<String>(
                               isExpanded: true,
                               hint: const Text('Month'),
                               value: _selectedMonth,
-                              items: months.map((month) {
-                                return DropdownMenuItem(
-                                  value: month,
-                                  child: Text(month),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedMonth = value;
-                                });
-                              },
+                              items: months
+                                  .map((month) => DropdownMenuItem(
+                                        value: month,
+                                        child: Text(month),
+                                      ))
+                                  .toList(),
+                              onChanged: _isLoading
+                                  ? null
+                                  : (value) {
+                                      setState(() {
+                                        _selectedMonth = value;
+                                      });
+                                    },
                               underline: Container(
                                 color: const Color(0xFFBDBDBD),
                                 height: 1,
@@ -318,7 +328,6 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          // Day Dropdown
                           Expanded(
                             child: DropdownButton<String>(
                               isExpanded: true,
@@ -331,11 +340,13 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                                   child: Text(day),
                                 );
                               }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedDay = value;
-                                });
-                              },
+                              onChanged: _isLoading
+                                  ? null
+                                  : (value) {
+                                      setState(() {
+                                        _selectedDay = value;
+                                      });
+                                    },
                               underline: Container(
                                 color: const Color(0xFFBDBDBD),
                                 height: 1,
@@ -343,28 +354,26 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          // Year Dropdown
                           Expanded(
                             child: DropdownButton<String>(
                               isExpanded: true,
                               hint: const Text('Year'),
                               value: _selectedYear,
-                              items: List.generate(
-                                100,
-                                (index) {
-                                  final year =
-                                      (DateTime.now().year - index).toString();
-                                  return DropdownMenuItem(
-                                    value: year,
-                                    child: Text(year),
-                                  );
-                                },
-                              ).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedYear = value;
-                                });
-                              },
+                              items: List.generate(100, (index) {
+                                final year =
+                                    (DateTime.now().year - index).toString();
+                                return DropdownMenuItem(
+                                  value: year,
+                                  child: Text(year),
+                                );
+                              }).toList(),
+                              onChanged: _isLoading
+                                  ? null
+                                  : (value) {
+                                      setState(() {
+                                        _selectedYear = value;
+                                      });
+                                    },
                               underline: Container(
                                 color: const Color(0xFFBDBDBD),
                                 height: 1,
@@ -374,51 +383,103 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      // Register Button
+
                       SizedBox(
                         width: double.infinity,
                         height: 48,
                         child: ElevatedButton(
-                          onPressed: () {
-                            final username = _usernameController.text.trim();
-                            final email = _emailController.text.trim();
-                            final password = _passwordController.text;
-                            final confirmPassword =
-                                _confirmPasswordController.text;
+                          onPressed: _isLoading
+                              ? null
+                              : () async {
+                                  final username =
+                                      _usernameController.text.trim();
+                                  final email = _emailController.text.trim();
+                                  final password = _passwordController.text;
+                                  final confirmPassword =
+                                      _confirmPasswordController.text;
 
-                            if (username.isEmpty ||
-                                email.isEmpty ||
-                                password.isEmpty ||
-                                confirmPassword.isEmpty ||
-                                _selectedMonth == null ||
-                                _selectedDay == null ||
-                                _selectedYear == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Please fill in all fields'),
-                                ),
-                              );
-                              return;
-                            }
+                                  if (username.isEmpty ||
+                                      email.isEmpty ||
+                                      password.isEmpty ||
+                                      confirmPassword.isEmpty ||
+                                      _selectedMonth == null ||
+                                      _selectedDay == null ||
+                                      _selectedYear == null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Please fill in all fields'),
+                                      ),
+                                    );
+                                    return;
+                                  }
 
-                            if (password != confirmPassword) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Passwords do not match'),
-                                ),
-                              );
-                              return;
-                            }
+                                  if (password != confirmPassword) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('Passwords do not match'),
+                                      ),
+                                    );
+                                    return;
+                                  }
 
-                            // Handle registration (currently only shows a success message)
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  '${widget.userType} registration submitted',
-                                ),
-                              ),
-                            );
-                          },
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
+
+                                  final authRepository =
+                                      context.read<AuthRepository>();
+
+                                  final monthIndex =
+                                      months.indexOf(_selectedMonth!);
+                                  final month = (monthIndex + 1)
+                                      .toString()
+                                      .padLeft(2, '0');
+                                  final day = _selectedDay!.padLeft(2, '0');
+                                  final year = _selectedYear!;
+                                  final birthDateIso = '$year-$month-$day';
+
+                                  try {
+                                    await authRepository.register(
+                                      email: email,
+                                      password: password,
+                                      username: username,
+                                      userType: widget.userType,
+                                      birthDate: birthDateIso,
+                                    );
+
+                                    if (!mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Registration successful (${widget.userType})',
+                                        ),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+
+                                    Navigator.pop(context);
+                                  } catch (e) {
+                                    if (!mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          e.toString().replaceFirst(
+                                                'Exception: ',
+                                                '',
+                                              ),
+                                        ),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  } finally {
+                                    if (mounted) {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                    }
+                                  }
+                                },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1565C0),
                             shape: RoundedRectangleBorder(
