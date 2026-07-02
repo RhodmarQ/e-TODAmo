@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.etodamo"
+    namespace = "com.example.flutter_application_1"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
